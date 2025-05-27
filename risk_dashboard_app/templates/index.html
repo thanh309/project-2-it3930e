@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Risk Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
+            max-width: 960px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1, h2, h3 {
+            color: #0056b3;
+        }
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #b0c4de;
+            border-radius: 5px;
+            background-color: #e9f5ff;
+        }
+        .form-section label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .form-section select,
+        .form-section button {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+        .form-section button {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .form-section button:hover {
+            background-color: #0056b3;
+        }
+        .results-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .plot-container {
+            margin-bottom: 40px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tbody tr:hover {
+            background-color: #e9e9e9;
+        }
+        .error-message {
+            color: red;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid red;
+            background-color: #ffebeb;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Repository Risk Dashboard</h1>
+
+        <div class="form-section">
+            <h2>Select Repository</h2>
+            <form action="/assess" method="post">
+                <label for="repo_name">Repository Name:</label>
+                <select id="repo_name" name="repo_name" required>
+                    {% for repo in repo_names %}
+                        <option value="{{ repo }}" {% if repo == repo_name %}selected{% endif %}>{{ repo }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Assess Risk</button>
+            </form>
+        </div>
+
+        {% if error_message %}
+            <div style="color: red; margin-bottom: 20px;">
+                {{ error_message }}
+            </div>
+        {% endif %}
+
+        {% if repo_name and results %}
+            <div class="results-section">
+                <h2>Assessment Results for {{ repo_name }}</h2>
+
+                <div class="repo-info">
+                    <p><strong>Number of Commits:</strong> {{ num_commits }}</p>
+                    <p><strong>Date Range:</strong> {{ date_range_start }} to {{ date_range_end }}</p>
+                    <p><strong>Type of Environment:</strong> {{ type_of_environment }}</p>
+                </div>
+
+                <div class="plot-container">
+                    {{ risk_plot_div | safe }}
+                </div>
+
+                <div class="plot-container">
+                    {{ entropy_plot_div | safe }}
+                </div>
+
+                <h3>Detailed Results</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Predicted Risk</th>
+                            <th>Confidence</th>
+                            <th>Uncertainty</th>
+                            <th>Entropy</th>
+                            <th>Actual Risk</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for result in results %}
+                            <tr>
+                                <td>{{ result.date }}</td>
+                                <td>{{ result.predicted_risk }}</td>
+                                <td>{{ result.confidence }}</td>
+                                <td>{{ result.uncertainty }}</td>
+                                <td>{{ result.entropy }}</td>
+                                <td>{{ result.actual_risk }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,6 @@
+flask
+pandas
+torch
+plotly
+scikit-learn
+python-dateutil
