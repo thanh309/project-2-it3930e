@@ -96,18 +96,13 @@ def assess():
         if df_repo.empty:
             return render_template('index.html', repo_names=[], error_message=f"No data found for repository: {repo_name}")
 
-        # Extract repository information
         num_commits = len(df_repo)
         date_range_start = df_repo['Scan date'].min().strftime('%Y-%m-%d') if not df_repo.empty else 'N/A'
         date_range_end = df_repo['Scan date'].max().strftime('%Y-%m-%d') if not df_repo.empty else 'N/A'
 
-        # Get unique environment types and decode them
         unique_environments_encoded = df_repo['Type of environment'].unique()
-        # Need to handle cases where 'Type of environment' might not be in the encoder classes
-        # This might happen if a repo only has data points with environment types not seen in training
-        # A safer approach is to use the original df_repo before any encoding attempts
         original_environments = df_repo['Type of environment'].unique().tolist()
-        type_of_environment = ", ".join(map(str, original_environments)) # Display all unique original environment types
+        type_of_environment = ", ".join(map(str, original_environments))
 
 
         date_col = 'Scan date'

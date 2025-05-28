@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from dateutil import parser
-import torch # Added torch import as it's used in the original notebook before preprocessing
+import torch
 
 def parse_mixed_date(date_str):
     try:
@@ -13,8 +13,8 @@ def preprocess_timeseries_dataframe(df: pd.DataFrame):
     df = df.copy()
     df = df.loc[:, (df != 0).any(axis=0)]
     df = df.drop(labels=['Sprint'], axis=1)
-    df['Scan date'] = df['Scan date'].astype(str).apply(parse_mixed_date) # Use the parse_mixed_date function
-    df['Scan date'] = pd.to_datetime(df['Scan date']) # Ensure datetime type after parsing
+    df['Scan date'] = df['Scan date'].astype(str).apply(parse_mixed_date)
+    df['Scan date'] = pd.to_datetime(df['Scan date'])
 
     categorical_columns = ['Time to complete each version', 'Commit frequency', 'Type of environment', 'Repo']
     group_sum_col = 'Change code line number'
@@ -72,11 +72,9 @@ def preprocess_timeseries_dataframe(df: pd.DataFrame):
 
     return X, y, meta, label_encoders, scaler
 
-# Add the initial data loading and mapping from the notebook for consistency
 if __name__ == "__main__":
     df = pd.read_csv('resources/data_v3.csv')
 
-    # Apply the parse_mixed_date function and convert to datetime
     df['Scan date'] = df['Scan date'].astype(str).apply(parse_mixed_date)
     df['Scan date'] = pd.to_datetime(df['Scan date'], errors='coerce')
 
